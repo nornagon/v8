@@ -13,7 +13,9 @@
 #else
 #define DISABLE_IN_RELEASE(Name) DISABLED_##Name
 #endif
-
+#ifdef _WIN32
+#pragma warning(disable:4724 4723)  // Disable potential divide by 0 warnings
+#endif
 namespace v8 {
 namespace base {
 namespace bits {
