@@ -168,6 +168,16 @@ template("v8_executable") {
 
 template("v8_component") {
   component(target_name) {
+    # If this is a non-component build, but this target forces itself to be
+    # a shared library, we must reset the default configs that were applied
+    # (see the set_defaults("component") statement in BUILDCONFIG.gn)
+    # and assign those for shared libraries.
+    if (defined(invoker.static_component_type) &&
+        invoker.static_component_type == "shared_library") {
+      configs = []
+      configs = default_shared_library_configs
+    }
+
     forward_variables_from(invoker, "*", [ "configs" ])
     configs += invoker.configs
     configs -= v8_remove_configs

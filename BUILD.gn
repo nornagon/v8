@@ -170,7 +170,7 @@ config("internal_config") {
 
   include_dirs = [ "." ]
 
-  if (is_component_build) {
+  if (is_component_build || is_electron_build) {
     defines = [ "BUILDING_V8_SHARED" ]
   }
 }
@@ -187,6 +187,20 @@ config("libplatform_config") {
   if (is_component_build) {
     defines = [ "USING_V8_PLATFORM_SHARED" ]
   }
+
+  # For Electron "static_library" all V8 symbols are together in one DLL.
+  # V8 targets which depend on libplatform need to be built with
+  # BUILDING_V8_PLATFORM_SHARED in order to declare its symbols as exported.
+  #
+  # Caveat:
+  # This setting applies to _all_ dependent targets, even those outside
+  # of V8! Currently there are no other targets dependent on v8_libplatform
+  # which Electron would consume, so we don't need to do more complicated tweaks
+  # but be aware of this and check that it's still the case when upgrading
+  # to newer Chromium version.
+  if (is_electron_build && !is_component_build) {
+    defines = [ "BUILDING_V8_PLATFORM_SHARED" ]
+  }
 }
 
 # This config should be applied to code using the libbase.
@@ -197,6 +211,20 @@ config("libbase_config") {
   libs = []
   if (is_android && current_toolchain != host_toolchain) {
     libs += [ "log" ]
+  }
+
+  # For Electron "static_library" all V8 symbols are together in one DLL.
+  # V8 targets which depend on libbase need to be built with
+  # BUILDING_V8_BASE_SHARED in order to declare its symbols as exported.
+  #
+  # Caveat:
+  # This setting applies to _all_ dependent targets, even those outside
+  # of V8! Currently there are no other targets dependent on v8_libbase
+  # which Electron would consume, so we don't need to do more complicated tweaks
+  # but be aware of this and check that it's still the case when upgrading
+  # to newer Chromium version.
+  if (is_electron_build && !is_component_build) {
+    defines = [ "BUILDING_V8_BASE_SHARED" ]
   }
 }
 
@@ -209,7 +237,7 @@ config("libsampler_config") {
 # itself.
 config("external_config") {
   defines = []
-  if (is_component_build) {
+  if (is_component_build || is_electron_build) {
     defines += [ "USING_V8_SHARED" ]
   }
   if (v8_enable_v8_checks) {
@@ -2674,6 +2702,8 @@ if (current_toolchain == v8_snapshot_toolchain) {
 
     configs = [ ":internal_config" ]
 
+    configs += [ "//libchromiumcontent/chromiumcontent/config:build_time_executable" ]
+
     deps = [
       ":v8_base",
       ":v8_init",
@@ -2760,7 +2790,7 @@ group("v8_fuzzers") {
   ]
 }
 
-if (is_component_build) {
+if (is_component_build || is_electron_build) {
   v8_component("v8") {
     sources = [
       "src/v8dll-main.cc",
@@ -2774,6 +2804,13 @@ if (is_component_build) {
     configs = [ ":internal_config" ]
 
     public_configs = [ ":external_config" ]
+
+    # For Electron "static_library" keep V8 as a shared library. This is only
+    # needed so that other targets in Chromium build cleanly. Electron doesn't
+    # need the DLL.
+    if (is_electron_build && !is_component_build) {
+      static_component_type = "shared_library"
+    }
   }
 
   v8_component("v8_for_testing") {
