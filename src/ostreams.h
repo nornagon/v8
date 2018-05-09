@@ -34,7 +34,7 @@ class OFStreamBase : public std::streambuf {
 
 
 // An output stream writing to a file.
-class V8_EXPORT_PRIVATE OFStream : public std::ostream {
+class V8_EXPORT_PRIVATE OFStream : public NON_EXPORTED_BASE(std::ostream) {
  public:
   explicit OFStream(FILE* f);
   virtual ~OFStream();
