@@ -8455,6 +8455,12 @@ CpuProfiler* Isolate::GetCpuProfiler() {
 }
 
 
+ArrayBuffer::Allocator* Isolate::GetArrayBufferAllocator() {
+  i::Isolate* isolate = reinterpret_cast<i::Isolate*>(this);
+  return isolate->array_buffer_allocator();
+}
+
+
 bool Isolate::InContext() {
   i::Isolate* isolate = reinterpret_cast<i::Isolate*>(this);
   return isolate->context() != NULL;

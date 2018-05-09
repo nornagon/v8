@@ -7278,6 +7278,9 @@ class V8_EXPORT Isolate {
   V8_DEPRECATE_SOON("CpuProfiler should be created with CpuProfiler::New call.",
                     CpuProfiler* GetCpuProfiler());
 
+  /** Returns the ArrayBuffer::Allocator used in this isolate. */
+  ArrayBuffer::Allocator* GetArrayBufferAllocator();
+
   /** Returns true if this isolate has a current context. */
   bool InContext();
 
