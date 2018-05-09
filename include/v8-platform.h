@@ -10,6 +10,8 @@
 #include <memory>
 #include <string>
 
+#include "v8.h"
+
 namespace v8 {
 
 class Isolate;
@@ -297,7 +299,7 @@ class Platform {
    * since epoch. Useful for implementing |CurrentClockTimeMillis| if
    * nothing special needed.
    */
-  static double SystemClockTimeMillis();
+  V8_EXPORT static double SystemClockTimeMillis();
 };
 
 }  // namespace v8
