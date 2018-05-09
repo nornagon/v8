@@ -3550,6 +3550,7 @@ Handle<Object> TranslatedState::MaterializeCapturedObjectAt(
     case JS_SET_VALUE_ITERATOR_TYPE: {
       Handle<JSSetIterator> object = Handle<JSSetIterator>::cast(
           isolate_->factory()->NewJSObjectFromMap(map, NOT_TENURED));
+      slot->value_ = object;
       Handle<Object> properties = materializer.FieldAt(value_index);
       Handle<Object> elements = materializer.FieldAt(value_index);
       Handle<Object> table = materializer.FieldAt(value_index);
@@ -3565,6 +3566,7 @@ Handle<Object> TranslatedState::MaterializeCapturedObjectAt(
     case JS_MAP_VALUE_ITERATOR_TYPE: {
       Handle<JSMapIterator> object = Handle<JSMapIterator>::cast(
           isolate_->factory()->NewJSObjectFromMap(map, NOT_TENURED));
+      slot->value_ = object;
       Handle<Object> properties = materializer.FieldAt(value_index);
       Handle<Object> elements = materializer.FieldAt(value_index);
       Handle<Object> table = materializer.FieldAt(value_index);
